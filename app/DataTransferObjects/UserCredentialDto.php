@@ -3,18 +3,13 @@
 namespace App\DataTransferObjects;
 
 use App\Exceptions\InvalidClassProperty;
-use JetBrains\PhpStorm\NoReturn;
-use stdClass;
 
-class UserCreateDto extends BaseDto
+class UserCredentialDto extends BaseDto
 {
-    private string $name;
     private string $email;
     private string $password;
-    private string $currency;
-    private bool $active = true;
 
-    private static UserCreateDto $instance;
+    private static UserCredentialDto $instance;
 
     public static function instantiate(): self
     {
@@ -32,7 +27,7 @@ class UserCreateDto extends BaseDto
         }
     }
 
-    public function preciseDto(array $arr): UserCreateDto
+    public function preciseDto(array $arr): self
     {
         $dto = new self();
         $dto->setProperties($arr);
