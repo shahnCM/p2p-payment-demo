@@ -22,8 +22,8 @@ class TransactionReportService
         return InitiatedTransactionRepository::Instantiate()->findUserWithMaxConversions();
     }
 
-    public function thirdHighestAmountOfTransactionByUser(int $userId = null): ?array
+    public function thirdHighestAmountOfTransactionByUser(int $userId): ?array
     {
-        return UserRepository::instantiate()->getNthHighestTransaction(3, $userId);
+        return UserRepository::instantiate()->getNthHighestTransaction($userId, 3);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\DataTransferObjects\UserCreateDto;
 use App\DataTransferObjects\UserCredentialDto;
-use App\DataTransferObjects\WalletCreateDto;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
@@ -25,7 +24,7 @@ class JwtAuthController extends Controller
     {
         $userCredentialDto = UserCredentialDto::instantiate()->preciseDto($request->only('email', 'password'));
 
-        $token = AuthenticationService::instantiate()->jwtLogin($userCredentialDto);
+        $token = AuthenticationService::instantiate()->jwtAttempt($userCredentialDto);
 
         if (!$token) {
             return $this->errorResponse([
@@ -44,8 +43,7 @@ class JwtAuthController extends Controller
         return $this->successResponse($responseData, 'Sign in successful');
     }
 
-    public function register(
-        RegistrationRequest $request, WalletService $walletService): JsonResponse
+    public function register(RegistrationRequest $request, WalletService $walletService): JsonResponse
     {
         $userCreateDto = UserCreateDto::instantiate()->preciseDto([
             'name' => $request->get('name'),
@@ -54,21 +52,19 @@ class JwtAuthController extends Controller
             'currency' => $request->get('currency')
         ]);
 
-        $walletCreateDto = WalletCreateDto::instantiate()->preciseDto([
-            'userId' => $user['id'] ?? 0,
-            'currency' => $userCreateDto->get('currency'),
-            'amount' => '0.00',
-        ]);
+        $newUserWithWallet = AuthenticationService::instantiate()->registerUserWithWalletCreation($userCreateDto);
 
-        $user = AuthenticationService::instantiate()->registerUser($userCreateDto);
-
-        $wallet = $walletService->createNewWallet($walletCreateDto);
+        if(is_null($newUserWithWallet)) {
+            return $this->errorResponse([
+                'registration-error' => 'There is a problem with registration or wallet creation'
+            ], 'Failed', 422);
+        }
 
         $responseData = [
-            'user' => $user,
-            'wallet' => $wallet,
+            'user' => $newUserWithWallet->get('user'),
+            'wallet' => $newUserWithWallet->get('wallet'),
             'authorization' => [
-                'token' => Auth::login($user),
+                'token' => AuthenticationService::instantiate()->loginUser($newUserWithWallet->get('user')),
                 'type' => 'bearer'
             ]
         ];
@@ -82,7 +78,7 @@ class JwtAuthController extends Controller
             'status' => 'success',
             'user' => Auth::user(),
             'authorisation' => [
-                'token' => Auth::refresh(),
+                'token' => AuthenticationService::instantiate()->refreshToken(),
                 'type' => 'bearer',
             ]
         ];
@@ -92,7 +88,8 @@ class JwtAuthController extends Controller
 
     public function logout(): JsonResponse
     {
-        Auth::logout();
+        AuthenticationService::instantiate()->logoutUser();
+
         return $this->successResponse([], 'Sign out successful');
     }
 }

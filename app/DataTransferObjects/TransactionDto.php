@@ -3,19 +3,20 @@
 namespace App\DataTransferObjects;
 
 use App\Exceptions\InvalidClassProperty;
+use App\Traits\DtoGenerics;
 
 class TransactionDto extends BaseDto
 {
-    public static function instance(): self
-    {
-        return new self();
-    }
+    use DtoGenerics;
 
-    public function get(string $propertyName)
+    private static TransactionDto $instance;
+
+    public static function instantiate(): self
     {
-        if(! property_exists($this, $propertyName)) {
-            throw new InvalidClassProperty();
+        if(!isset(self::$instance)) {
+            self::$instance = new self();
         }
-        return $this->$propertyName;
+
+        return self::$instance;
     }
 }

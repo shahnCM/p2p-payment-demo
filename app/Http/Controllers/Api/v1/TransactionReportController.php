@@ -17,24 +17,18 @@ class TransactionReportController extends Controller
 
     public function TransactionReports(TransactionReportService $transactionReportService): JsonResponse
     {
-        $thirdHighestAmountOfTransactionByUser =
+        $data = [];
+
+        $data['thirdHighestAmountOfTransactionByUser'] =
             $transactionReportService->thirdHighestAmountOfTransactionByUser(2);
-        $userWhoUsedMostConversion =
+        $data['userWhoUsedMostConversion'] =
             $transactionReportService->userWhoUsedMostConversion();
-        $userWhoUsedHighestConversion =
+        $data['userWhoUsedHighestConversion'] =
             $transactionReportService->userWhoUsedHighestConversion();
-        $totalAmountConvertedForParticularUser =
+        $data['totalAmountConvertedForParticularUser'] =
             $transactionReportService->totalAmountConvertedForParticularUser(2);
 
-        return $this->successResponse(new UserWithThirdHighestTransactionResource($thirdHighestAmountOfTransactionByUser));
 
-        dd(
-            $thirdHighestAmountOfTransactionByUser,
-            $userWhoUsedMostConversion,
-            $userWhoUsedHighestConversion,
-            $totalAmountConvertedForParticularUser
-        );
-
-        return $this->successResponse($transactionPayloadDto, 'Dto creation successful');
+        return $this->successResponse($data, 'All Query Data');
     }
 }

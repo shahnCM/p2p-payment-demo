@@ -41,22 +41,23 @@ class UserRepository extends BaseRepository
         return $toArray ? $user?->toArray() : $user;
     }
 
-    public function getNthHighestTransaction(int $n = 1, int $userId = null): null|array
+    public function getNthHighestTransaction(int $userId, int $n = 1): null|array
     {
         $query = $this->model->query();
 
         $query->with(['completedDebitTransactions' => function ($q) use ($n){
-            $q->orderByRaw('CONVERT(amount_before, SIGNED) desc')->offset($n - 1)->limit(1);
+            $q->orderByRaw('CONVERT(amount_before, SIGNED) desc')->offset($n - 1)->first();
         }]);
 
         $query->whereHas('completedDebitTransactions', function ($q) use ($n) {
             $q->where('status', TransactionStatus::S);
         });
 
-        if(!is_null($userId)) {
-            return $query->where('id', $userId)->first()?->toArray();
-        }
+        $result = $query->where('id', $userId)->first();
 
-        return $query->get()?->toArray();
+        return $result->completedDebitTransactions->map(function ($item) use ($result){
+            $result->third_highest_transactions = $item->first()?->toArray();
+            return $result->getAttributes();
+        })?->first();
     }
 }
