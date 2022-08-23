@@ -11,6 +11,8 @@ class WalletService
 {
     private static WalletService $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

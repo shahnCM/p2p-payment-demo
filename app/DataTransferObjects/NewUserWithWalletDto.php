@@ -16,6 +16,8 @@ class NewUserWithWalletDto extends BaseDto
 
     private static NewUserWithWalletDto $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

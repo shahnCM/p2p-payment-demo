@@ -11,6 +11,8 @@ class TransactionDto extends BaseDto
 
     private static TransactionDto $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

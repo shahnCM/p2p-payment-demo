@@ -15,6 +15,8 @@ class WalletCreateDto extends BaseDto
 
     private static WalletCreateDto $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

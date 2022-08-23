@@ -19,6 +19,8 @@ class UserCreateDto extends BaseDto
 
     private static UserCreateDto $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

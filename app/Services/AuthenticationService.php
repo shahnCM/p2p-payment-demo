@@ -17,6 +17,8 @@ class AuthenticationService
 {
     private static AuthenticationService $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {

@@ -14,6 +14,8 @@ class UserCredentialDto extends BaseDto
 
     private static UserCredentialDto $instance;
 
+    private final function __construct() {}
+
     public static function instantiate(): self
     {
         if(!isset(self::$instance)) {
